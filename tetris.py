@@ -4,6 +4,7 @@ import numpy as np
 
 sense = sense_hat.SenseHat()
 sense.clear()
+sense.set_rotation(90)
 
 #ジョイスティック設定
 left_key   = sense_hat.DIRECTION_LEFT
@@ -98,20 +99,36 @@ def randomDrawTetro():
             if tetroType[s][j][k] == 1:
                 sense.set_pixel(k +2, j, tetroColor[c])
 
-#
-def
+#テトリミノの座標
+def tetroMap(x, y):
+    pixelList = sense.get_pixels()
+    for i in range(0, 64):
+        if pixelList[i] != [0, 0, 0]:
+            sense.set_pixel(i%8 + x, i/8 + y, pixelList[i])
+            
 
-#
-def
-
-#
-def
-
-#
-def
+#テトロミノをジョイスティックで操作
+def moveRotation():
+    events = sense.stick.get_events()
+    if events:
+        for e in events:
+            #左への移動
+            if e.direction == left_key and e.action == pressed:
+                tetroMap(-1, 0)
+            #右への移動
+            if e.direction == right_key and e.action == pressed:
+                tetroMap(1, 0)
+            #テトロの回転
+            if e.direction == up_key and e.action == pressed:
+            #テトロの速度up
+            if e.direction == down_key and e.action == pressed:
+            #テトロの速度を戻す
+            if e.direction == down_key and e.action == released:
+            
+#テスト
+randomdrawTetro()
+moveRotation()
 
 
 #main関数
-while True:
-
-    drawTetro()
+#while True:
