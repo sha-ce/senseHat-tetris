@@ -100,12 +100,18 @@ def randomDrawTetro():
                 sense.set_pixel(k +2, j, tetroColor[c])
 
 #テトリミノの座標
-def tetroMap(x, y):
+def tetroMap(dx, dy):
     pixelList = sense.get_pixels()
     for i in range(0, 64):
         if pixelList[i] != [0, 0, 0]:
-            sense.set_pixel(i%8, i//8, [0, 0, 0])
-            sense.set_pixel(i%8 + x, i//8 + y, pixelList[i])
+            if pixelList[i] == pixelList[i+1]:
+                sense.set_pixel(i%8, i//8, [0, 0, 0])
+                sense.set_pixel(i%8 + dx, i//8 + dy, pixelList[i])
+                sense.set_pixel((i+1)%8 + dx, (i+1)//8 + dy, pixelList[i+1])
+                i += 1
+            else:
+                sense.set_pixel(i%8, i//8, [0, 0, 0])
+                sense.set_pixel(i%8 + dx, i//8 + dy, pixelList[i])
 
 
 #テトロミノをジョイスティックで操作
