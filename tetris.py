@@ -29,24 +29,6 @@ interbal = gameSpeed
 gameOver = False
 
 
-
-#テトリミノのサイズ
-tetroSize = 4
-
-
-tetroShape = np.random.randint(1, 8) #形
-tetroCol   = np.random.randint(1, 8) #色
-#テトリミノ本体
-tetro = tetroType[tetroShape]
-
-#スタート地点
-start_x = playfieldSize//2 - tetroSize//2
-start_y = 0
-
-#テトリミノの座標
-tetro_x = start_x
-tetro_y = start_y
-
 #テトリスの色を定義
 tetroColor = [
     [],
@@ -105,6 +87,27 @@ tetroType = np.array([
         [0,0,0,0]   #7-S
     ],
 ])
+
+
+
+
+#テトリミノのサイズ
+tetroSize = 4
+
+
+tetroShape = np.random.randint(1, 8) #形
+tetroCol   = np.random.randint(1, 8) #色
+#テトリミノ本体
+tetro = tetroType[tetroShape]
+
+#スタート地点
+start_x = playfieldSize//2 - tetroSize//2
+start_y = 0
+
+#テトリミノの座標
+tetro_x = start_x
+tetro_y = start_y
+
 
 
 #テトロミノを描画
