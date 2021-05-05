@@ -1,9 +1,8 @@
 #必要なライブラリをimport
-import sense_hat
 from sense_hat import SenseHat
 import numpy as np
 
-sense = SenseHat()
+sense = sense_hat.SenseHat()
 sense.clear()
 
 #ジョイスティック設定
@@ -89,5 +88,5 @@ tetroType = np.array([
 ])
 
 for i in range(1,8):
-    sense.set_pixels(tetroType[i])
+    sense.set_pixel(tetroColor[2])
 
