@@ -87,4 +87,6 @@ tetroType = np.array([
     ],
 ])
 
-sense.set_pixels(tetroType[1], tetroColor[1])
+for i in range(1,8):
+    sense.set_pixels(tetroType[i])
+
