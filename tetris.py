@@ -104,8 +104,9 @@ def tetroMap(x, y):
     pixelList = sense.get_pixels()
     for i in range(0, 64):
         if pixelList[i] != [0, 0, 0]:
-            sense.set_pixel(i%8 + x, i/8 + y, pixelList[i])
-            
+            sense.set_pixel(i%8, i//8, [0, 0, 0])
+            sense.set_pixel(i%8 + x, i//8 + y, pixelList[i])
+
 
 #テトロミノをジョイスティックで操作
 def moveRotation():
@@ -119,15 +120,17 @@ def moveRotation():
             if e.direction == right_key and e.action == pressed:
                 tetroMap(1, 0)
             #テトロの回転
-            if e.direction == up_key and e.action == pressed:
+            #if e.direction == up_key and e.action == pressed:
             #テトロの速度up
-            if e.direction == down_key and e.action == pressed:
+            #if e.direction == down_key and e.action == pressed:
             #テトロの速度を戻す
-            if e.direction == down_key and e.action == released:
+            #if e.direction == down_key and e.action == released:
             
 #テスト
-randomdrawTetro()
-moveRotation()
+randomDrawTetro()
+while True:
+    moveRotation()
+
 
 
 #main関数
