@@ -1,4 +1,5 @@
 import sense_hat
+from sense_hat import SenseHat
 import numpy as np
 import time
 import random
