@@ -1,5 +1,5 @@
 #必要なライブラリをimport
-from sense_hat import SenseHat
+import sense_hat
 import numpy as np
 
 sense = sense_hat.SenseHat()
@@ -88,5 +88,7 @@ tetroType = np.array([
 ])
 
 for i in range(1,8):
-    sense.set_pixel(tetroColor[2])
+    for j in range(0, 5):
+        for k in range(0, 5):
+            sense.set_pixel(tetroType[i][j][k], tetroType[i][j][k], tetroColor[2])
 
