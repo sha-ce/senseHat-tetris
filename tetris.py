@@ -87,10 +87,15 @@ tetroType = np.array([
     ],
 ])
 
-i = 4
 
-for j in range(0, 4):
-    for k in range(0, 4):
-        if tetroType[i][j][k] == 1:
-            sense.set_pixel(j, k, tetroColor[i])
 
+def drawTetro():
+    i = np.random.randint(1, 8)
+
+    
+    for j in range(0, 4):
+        for k in range(0, 4):
+            if tetroType[i][j][k] == 1:
+                sense.set_pixel(k +2, j, tetroColor[i])
+
+drawTetro()
