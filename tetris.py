@@ -1,4 +1,5 @@
 #必要なライブラリをimport
+import sense_hat
 from sense_hat import SenseHat
 import numpy as np
 
