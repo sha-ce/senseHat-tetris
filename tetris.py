@@ -42,12 +42,12 @@ tetroColor = [
 
 #テトリミノの形を定義
 tetroType = np.array([
-    [],#空っぽ
+    [],             #空っぽ
     [
         [1,1,1,1],
         [0,0,0,0],
         [0,0,0,0],
-        [0,0,0,0]  #1-I
+        [0,0,0,0]   #1-I
     ],
     [
         [0,1,0,0],
@@ -88,14 +88,30 @@ tetroType = np.array([
 ])
 
 
+#7種類のテトロミノのランダム生成
+def randomDrawTetro():
+    s = np.random.randint(1, 8) #形の乱数
+    c = np.random.randint(1, 8) #色の乱数
 
-def drawTetro():
-    i = np.random.randint(1, 8)
-
-    
     for j in range(0, 4):
         for k in range(0, 4):
-            if tetroType[i][j][k] == 1:
-                sense.set_pixel(k +2, j, tetroColor[i])
+            if tetroType[s][j][k] == 1:
+                sense.set_pixel(k +2, j, tetroColor[c])
 
-drawTetro()
+#
+def
+
+#
+def
+
+#
+def
+
+#
+def
+
+
+#main関数
+while True:
+
+    drawTetro()
