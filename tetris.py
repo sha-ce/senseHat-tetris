@@ -44,8 +44,8 @@ tetroColor = [
 tetroType = np.array([
     [],#空っぽ
     [
-        [0,0,0,0],
         [1,1,1,1],
+        [0,0,0,0],
         [0,0,0,0],
         [0,0,0,0]  #1-I
     ],
@@ -68,27 +68,29 @@ tetroType = np.array([
         [0,0,0,0]   #4-T
     ],
     [
+        [0,1,1,0],
+        [0,1,1,0],
         [0,0,0,0],
-        [0,1,1,0],
-        [0,1,1,0],
         [0,0,0,0]   #5-O
     ],
     [
-        [0,0,0,0],
         [1,1,0,0],
         [0,1,1,0],
+        [0,0,0,0],
         [0,0,0,0]   #6-Z
     ],
     [
-        [0,0,0,0],
         [0,1,1,0],
         [1,1,0,0],
+        [0,0,0,0],
         [0,0,0,0]   #7-S
     ],
 ])
 
-for i in range(1,8):
-    for j in range(0, 5):
-        for k in range(0, 5):
-            sense.set_pixel(tetroType[i][j][k], tetroType[i][j][k], tetroColor[2])
+i = 4
+
+for j in range(0, 4):
+    for k in range(0, 4):
+        if tetroType[i][j][k] == 1:
+            sense.set_pixel(j, k, tetroColor[i])
 
