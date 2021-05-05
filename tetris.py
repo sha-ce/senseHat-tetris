@@ -22,12 +22,30 @@ playfield = np.zeros((playfieldSize, playfieldSize))
 #ゲームスピード
 gameSpeed = 0.5
 
-#main関数での変数
-lft = 0.0
-timeCounter = 0.0
+#変数
+lines = 0
 score = 0
 interbal = gameSpeed
 gameOver = False
+
+
+
+#テトリミノのサイズ
+tetroSize = 4
+
+
+tetroShape = np.random.randint(1, 8) #形
+tetroCol   = np.random.randint(1, 8) #色
+#テトリミノ本体
+tetro = tetroType[tetroShape]
+
+#スタート地点
+start_x = playfieldSize//2 - tetroSize//2
+start_y = 0
+
+#テトリミノの座標
+tetro_x = start_x
+tetro_y = start_y
 
 #テトリスの色を定義
 tetroColor = [
@@ -89,55 +107,118 @@ tetroType = np.array([
 ])
 
 
-#7種類のテトロミノのランダム生成
-def randomDrawTetro():
-    s = np.random.randint(1, 8) #形の乱数
-    c = np.random.randint(1, 8) #色の乱数
+#テトロミノを描画
+def drawTetro():
+    for y in range(0, tetroSize):
+        for x in range(0, tetroSize):
+            if tetro[y][x]:
+                sense.set_pixel(x + start_x, y + start_y, tetroColor[tetroCol])
+    if gameOver:
+        sense.show_message("Game Over", 0.05, [255, 0, 0], [0, 0, 0])
 
-    for j in range(0, 4):
-        for k in range(0, 4):
-            if tetroType[s][j][k] == 1:
-                sense.set_pixel(k +2, j, tetroColor[c])
+#ブロックの衝突判定
+def checkMove(mx, my, ntetro):
+    if ntetro == None:
+        ntetro = tetro
+    for y in range(0, tetroSize):
+        for x in range(0, tetroSize):
+            nx = tetro_x + mx + x
+            ny = tetro_y + my + y
+            if ntetro[y][x]:
+                if ny < 0 or nx < 0 or ny >= playfieldSize or nx >= playfieldSize or playfield[ny][nx]:
+                    return False
+    return True
 
-#テトリミノの座標
-def tetroMap(dx, dy):
-    pixelList = sense.get_pixels()
-    for i in range(0, 64):
-        if pixelList[i] != [0, 0, 0]:
-            if pixelList[i] == pixelList[i+1]:
-                sense.set_pixel(i%8, i//8, [0, 0, 0])
-                sense.set_pixel(i%8 + dx, i//8 + dy, pixelList[i])
-                sense.set_pixel((i+1)%8 + dx, (i+1)//8 + dy, pixelList[i+1])
-                i += 1
-            else:
-                sense.set_pixel(i%8, i//8, [0, 0, 0])
-                sense.set_pixel(i%8 + dx, i//8 + dy, pixelList[i])
+#テトリミノの回転
+def rotate():
+    ntetro = []
+    for y in range(0, tetroSize):
+        ntetro[y] = []
+        for x in range(0, tetroSize):
+            ntetro[y][x] = tetro[tetroSize-1 - x][y]
+    return ntetro
+
+#ブロックの固定
+def fixTetro():
+    for y in range(0, tetroSize):
+        for x in range(0, tetroSize):
+            if tetro[y][x]:
+                playfield[tetro_y + y][tetro_x + x] = tetroShape
+
+#ラインの消去
+def checkLine():
+    linec = 0
+    for y in range(0, playfieldSize):
+        frag = True
+        for x in range(0, playfieldSize):
+            if not playfield[y][x]:
+                frag == False
+                break
+        if frag:
+            linec += 1
+            for ny in range(0, y):
+                for nx in range(0, playfieldSize):
+                    playfield[ny][nx] = playfield[ny-1][nx]
+
+#テトリミノの落下
+def dropTetro():
+    if gameOver:
+        return
+
+    if checkMove(0, 1):
+        tetro_y += 1
+    else:
+        fixTetro()
+        checkLine()
+
+        tetroShape = np.random.randint(1, 8)
+        tetro = tetroType[tetroShape]
+
+        tetro_x = start_x
+        tetro_y = start_y
+
+        if not checkMove(0, 0):
+            gameOver = True
+
+    drawTetro()
 
 
-#テトロミノをジョイスティックで操作
+
+
+
+
+#ジョイスティックでの操作
 def moveRotation():
+    if gameOver:
+        return
+
     events = sense.stick.get_events()
     if events:
         for e in events:
-            #左への移動
+            #左
             if e.direction == left_key and e.action == pressed:
-                tetroMap(-1, 0)
-            #右への移動
+                if checkMove(-1, 0):
+                    tetro_x -= 1
+                    break
+            #右
             if e.direction == right_key and e.action == pressed:
-                tetroMap(1, 0)
-            #テトロの回転
-            #if e.direction == up_key and e.action == pressed:
-            #テトロの速度up
-            #if e.direction == down_key and e.action == pressed:
-            #テトロの速度を戻す
-            #if e.direction == down_key and e.action == released:
-            
-#テスト
-randomDrawTetro()
-while True:
-    moveRotation()
-
-
+                if checkMove(1, 0):
+                    tetro_x += 1
+                    break
+            #上
+            if e.direction == up_key and e.action == pressed:
+                ntetro = rotate()
+                if checkMove(0, 0, ntetro):
+                    tetro = ntetro
+                    break
+            #下
+            if e.direction == down_key and e.action == pressed:
+                if checkMove(0, 1):
+                    tetro_y += 1
+                    break
 
 #main関数
-#while True:
+drawTetro()
+while True:
+    dropTetro()
+    moveRotation()
