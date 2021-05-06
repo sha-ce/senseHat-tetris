@@ -101,17 +101,10 @@ def drawTetro():
     tetorCol = np.random.randint(1, 8)   #色
     tetroShape = np.random.randint(1, 8) #形
     tetro = tetroType[tetroShape]        #テトリミノ本体
-    for j in range(0, 4):
-        for k in range(0, 4):
+    for j in range(0, tetroSize):
+        for k in range(0, tetroSize):
             if tetroType[tetroShape][j][k] == 1:
                 sense.set_pixel(k + start_x, j + start_y, tetroColor[tetorCol])
-
-#ブロックの衝突判定
-def checkMove(x, y):
-    if(x < 0 or x >= playfieldSize or y < 0 or y >= playfieldSize):
-        return False
-    else:
-        return True
 
 #テトリミノの移動
 def moveBlock(dx, dy):
@@ -120,17 +113,39 @@ def moveBlock(dx, dy):
     for i in range(0, 64):
         if pixelList[i] != [0, 0, 0]:
             array.append(i)
-    sense.clean()
+    sense.clear()
     for j in range(0, blockSize):
+        #壁にテトリミノが衝突した場合移動はさせない
         if(array[j]%8 + dx < 0 or array[j]%8 + dx >= playfieldSize or array[j]//8 + dy < 0 or array[j]//8 + dy >= playfieldSize):
-            sense.set_pixel(array[j]%8, array[j]//8, pixelList[array[j]])
+            sense.set_pixels(pixelList)
+            break
         else:
             sense.set_pixel(array[j]%8 + dx, array[j]//8 + dy, pixelList[array[j]])
 
-
-
 #テトリミノの回転
-#def rotate():
+def rotate():
+    pixelList = sense.get_pixels()
+    array = []
+    for i in range(0, 64):
+        if pixelList[i] != [0, 0, 0]:
+            array.append(i)
+    sense.clear()
+    for j in range(0, blockSize):
+        #壁にテトリミノが衝突した場合回転はさせない
+        if(array[j]%8 + dx < 0 or array[j]%8 + dx >= playfieldSize or array[j]//8 + dy < 0 or array[j]//8 + dy >= playfieldSize):
+            sense.set_pixels(pixelList)
+            break
+        else:
+            sense.set_pixel(array[j]//8, array[j]%8, pixelList[array[j]])
+
+
+
+    for i in range(0, tetroSize):
+        for j in range(0, tetroSize):
+            if tetroType[tetroShape][i][j] == 1:
+                sense.set_pixel(i, j, pixelList[array[j]])
+
+
 
 #ブロックの固定
 #def fixBlock():
@@ -153,11 +168,11 @@ def joystick():
             if e.direction == right_key and e.action == pressed:
                 moveBlock(1, 0)
             #テトロの回転
-            #if e.direction == up_key and e.action == pressed:
-            #テトロの速度up
-            #if e.direction == down_key and e.action == pressed:
-            #テトロの速度を戻す
-            #if e.direction == down_key and e.action == released:
+            if e.direction == up_key and e.action == pressed:
+                rotate()
+            #下への移動
+            if e.direction == down_key and e.action == pressed:
+                moveBlock(0, 1)
             
 #テスト
 drawTetro()
