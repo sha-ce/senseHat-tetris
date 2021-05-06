@@ -88,17 +88,11 @@ tetroType = np.array([
 ])
 #テトリミノのサイズ
 tetroSize = 4
+blockSize = 4
 
 #スタートの座標
 start_x = playfieldSize//2 - tetroSize//2
 start_y = 0
-#テトリミノの座標
-tetro_x = start_x
-tetro_y = start_y
-
-
-
-
 
 
 
@@ -111,10 +105,20 @@ def drawTetro():
         for k in range(0, 4):
             if tetroType[tetroShape][j][k] == 1:
                 sense.set_pixel(k + start_x, j + start_y, tetroColor[tetorCol])
-    return tetro
 
 #ブロックの衝突判定
 #def checkMove():
+
+#テトリミノの移動
+def moveBlock(dx, dy):
+    pixelList = sense.get_pixels()
+    for i in range(0, 64):
+        if pixelList[i] != [0, 0, 0]:
+            array.append = i
+    sense.clean()
+    for j in range(0, blockSize):
+        sense.set_pixel(array[j]%8 + dx, array[j]//8 + dy, pixelList[array[j]])
+
 
 #テトリミノの回転
 #def rotate():
@@ -135,10 +139,10 @@ def joystick():
         for e in events:
             #左への移動
             if e.direction == left_key and e.action == pressed:
-                tetroMap(-1, 0)
+                moveBlock(-1, 0)
             #右への移動
             if e.direction == right_key and e.action == pressed:
-                tetroMap(1, 0)
+                moveBlock(1, 0)
             #テトロの回転
             #if e.direction == up_key and e.action == pressed:
             #テトロの速度up
