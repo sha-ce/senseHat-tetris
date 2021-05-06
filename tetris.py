@@ -107,17 +107,26 @@ def drawTetro():
                 sense.set_pixel(k + start_x, j + start_y, tetroColor[tetorCol])
 
 #ブロックの衝突判定
-#def checkMove():
+def checkMove(x, y):
+    if(x < 0 or x >= playfieldSize or y < 0 or y >= playfieldSize):
+        return False
+    else:
+        return True
 
 #テトリミノの移動
 def moveBlock(dx, dy):
     pixelList = sense.get_pixels()
+    array = []
     for i in range(0, 64):
         if pixelList[i] != [0, 0, 0]:
-            array.append = i
+            array.append(i)
     sense.clean()
     for j in range(0, blockSize):
-        sense.set_pixel(array[j]%8 + dx, array[j]//8 + dy, pixelList[array[j]])
+        if(array[j]%8 + dx < 0 or array[j]%8 + dx >= playfieldSize or array[j]//8 + dy < 0 or array[j]//8 + dy >= playfieldSize):
+            sense.set_pixel(array[j]%8, array[j]//8, pixelList[array[j]])
+        else:
+            sense.set_pixel(array[j]%8 + dx, array[j]//8 + dy, pixelList[array[j]])
+
 
 
 #テトリミノの回転
