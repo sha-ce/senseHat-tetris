@@ -44,8 +44,8 @@ tetroColor = [
 tetroType = np.array([
     [],             #空っぽ
     [
-        [1,1,1,1],
         [0,0,0,0],
+        [1,1,1,1],
         [0,0,0,0],
         [0,0,0,0]   #1-I
     ],
@@ -68,9 +68,9 @@ tetroType = np.array([
         [0,0,0,0]   #4-T
     ],
     [
-        [0,1,1,0],
-        [0,1,1,0],
         [0,0,0,0],
+        [0,1,1,0],
+        [0,1,1,0],
         [0,0,0,0]   #5-O
     ],
     [
@@ -98,9 +98,8 @@ start_y = 0
 
 #テトロミノの描画
 def drawTetro():
-    tetorCol = np.random.randint(1, 8)   #色
-    tetroShape = np.random.randint(1, 8) #形
-    tetro = tetroType[tetroShape]        #テトリミノ本体
+    global tetorCol = np.random.randint(1, 8)   #色
+    global tetroShape = np.random.randint(1, 8) #形
     for j in range(0, tetroSize):
         for k in range(0, tetroSize):
             if tetroType[tetroShape][j][k] == 1:
@@ -126,24 +125,22 @@ def moveBlock(dx, dy):
 def rotate():
     pixelList = sense.get_pixels()
     array = []
+    tetro_rot = np.rot90(tetroType[tetroShape])
+    global tetroType[tetroShape] = tetro_rot
     for i in range(0, 64):
         if pixelList[i] != [0, 0, 0]:
             array.append(i)
     sense.clear()
     for j in range(0, blockSize):
         #壁にテトリミノが衝突した場合回転はさせない
-        if(array[j]%8 + dx < 0 or array[j]%8 + dx >= playfieldSize or array[j]//8 + dy < 0 or array[j]//8 + dy >= playfieldSize):
-            sense.set_pixels(pixelList)
-            break
-        else:
-            sense.set_pixel(array[j]//8, array[j]%8, pixelList[array[j]])
-
-
-
-    for i in range(0, tetroSize):
-        for j in range(0, tetroSize):
-            if tetroType[tetroShape][i][j] == 1:
-                sense.set_pixel(i, j, pixelList[array[j]])
+        for l in range(0, tetroSize):
+            for k in range(0, tetroSize):
+                if(k + array[j]%8 < 0 or k + array[j]%8 >= playfieldSize or l + array[j]//8 < 0 or l + array[j]//8 >= playfieldSize):
+                    sense.set_pixels(pixelList)
+                    break
+                else:
+                    if tetroType[tetroShape][l][k] == 1:
+                        sense.set_pixel(k + array[j]%8, l + array[j]//8, tetroColor[tetorCol])
 
 
 
