@@ -90,6 +90,10 @@ tetroType = np.array([
 tetroSize = 4
 blockSize = 4
 
+#テトリミノの色と形
+tetroCol = np.random.randint(1, 8)   #色
+tetroShape = np.random.randint(1, 8) #形
+
 #スタートの座標
 start_x = playfieldSize//2 - tetroSize//2
 start_y = 0
@@ -98,12 +102,14 @@ start_y = 0
 
 #テトロミノの描画
 def drawTetro():
-    global tetorCol = np.random.randint(1, 8)   #色
-    global tetroShape = np.random.randint(1, 8) #形
+    global tetroCol
+    global tetroShape
+    tetroCol = np.random.randint(1, 8)   #色
+    tetroShape = np.random.randint(1, 8) #形
     for j in range(0, tetroSize):
         for k in range(0, tetroSize):
             if tetroType[tetroShape][j][k] == 1:
-                sense.set_pixel(k + start_x, j + start_y, tetroColor[tetorCol])
+                sense.set_pixel(k + start_x, j + start_y, tetroColor[tetroCol])
 
 #テトリミノの移動
 def moveBlock(dx, dy):
@@ -126,21 +132,15 @@ def rotate():
     pixelList = sense.get_pixels()
     array = []
     tetro_rot = np.rot90(tetroType[tetroShape])
-    global tetroType[tetroShape] = tetro_rot
     for i in range(0, 64):
         if pixelList[i] != [0, 0, 0]:
             array.append(i)
     sense.clear()
     for j in range(0, blockSize):
-        #壁にテトリミノが衝突した場合回転はさせない
-        for l in range(0, tetroSize):
-            for k in range(0, tetroSize):
-                if(k + array[j]%8 < 0 or k + array[j]%8 >= playfieldSize or l + array[j]//8 < 0 or l + array[j]//8 >= playfieldSize):
-                    sense.set_pixels(pixelList)
-                    break
-                else:
-                    if tetroType[tetroShape][l][k] == 1:
-                        sense.set_pixel(k + array[j]%8, l + array[j]//8, tetroColor[tetorCol])
+        for k in range(0, tetroSize):
+            for l in range(0, tetroSize):
+                if tetro_rot[k][l] == 1:
+                    sense.set_pixel(array[j]%8 + l, array[j]//8 + k, pixelList[array[j]])
 
 
 
