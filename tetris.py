@@ -1,4 +1,4 @@
-#必要なライブラリをimport
+#必要なモジュールをimport
 import time
 import sense_hat
 import numpy as np
