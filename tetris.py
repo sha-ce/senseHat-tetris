@@ -16,12 +16,20 @@ middle_key = sense_hat.DIRECTION_MIDDLE
 pressed    = sense_hat.ACTION_PRESSED
 released   = sense_hat.ACTION_RELEASED
 
+#画面の回転
+sense.set_rotation(90)
+left_key  = sense_hat.DIRECTION_UP
+right_key = sense_hat.DIRECTION_DOWN
+up_key    = sense_hat.DIRECTION_RIGHT
+down_key  = sense_hat.DIRECTION_LEFT
+
+
 #フィールドサイズ
 playfieldSize = 10
 playfield = np.zeros((playfieldSize, playfieldSize))
 
 #ゲームスピード
-gameSpeed = 0.5
+gameSpeed = 0.8
 
 #main関数での変数
 lft = 0.0
@@ -32,7 +40,7 @@ gameOver = False
 
 #LEDマトリックスの外に境界線を作る
 for i in range(0, playfieldSize):
-    playfield[i][0] = 1
+    #playfield[i][0] = 1
     playfield[i][playfieldSize-1] = 1
     playfield[0][i] = 1
     playfield[playfieldSize-1][i] = 1
@@ -40,7 +48,7 @@ for i in range(0, playfieldSize):
 #playfield
 #       0  1  2  3  4  5  6  7  8  9
 #
-#   0   1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+#   0   1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 #   1   1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 #   2   1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 #   3   1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -54,15 +62,16 @@ for i in range(0, playfieldSize):
 
 
 #テトリスの色を定義
-tetroColor = [
-    [0, 255, 255],   #1-水
-    [0, 0, 255],     #2-青
-    [255, 0, 255],   #3-紫
-    [255, 255, 0],   #4-黄
-    [255, 0, 0],     #5-赤
-    [0, 255, 0],     #6-緑
-    [255, 255, 255], #7-白
-]
+tetroColor = {
+    0:(0, 0, 0),
+    1:(0, 255, 255),   #1-水
+    2:(0, 0, 255),     #2-青
+    3:(255, 0, 255),   #3-紫
+    4:(255, 255, 0),   #4-黄
+    5:(255, 0, 0),     #5-赤
+    6:(0, 255, 0),     #6-緑
+    7:(255, 255, 255)  #7-白
+}
 
 #テトリミノの形を定義
 tetroType = np.array([
@@ -75,25 +84,22 @@ tetroType = np.array([
     [0xF0, 0x132, 0xF0, 0x132],   #7-S
 ])
 
-#リスタート時の矢印
+#リスタート画面の表示
 w = [150, 150, 150]
 e = [0, 0, 0]
 
-arrow = [
-    e, e, e, w, w, e, e, e,
-    e, e, w, w, w, w, e, e,
-    e, w, e, w, w, e, w, e,
-    w, e, e, w, w, e, e, w,
-    e, e, e, w, w, e, e, e,
-    e, e, e, w, w, e, e, e,
-    e, e, e, w, w, e, e, e,
-    e, e, e, w, w, e, e, e,
+re = [
+    e, e, e, e, e, e, e, e,
+    w, e, w, e, e, w, w, e,
+    w, w, e, w, w, e, e, w,
+    w, e, e, e, w, w, w, w,
+    w, e, e, e, w, e, e, e,
+    w, e, e, e, w, e, e, w,
+    w, e, e, e, e, w, w, e,
+    e, e, e, e, e, e, e, e,
 ]
 
-#テトリミノのサイズ
-tetroSize = 3
-
-#テトロミノに関するグローバス変数の定義
+#テトロミノの変数の定義
 activeTetro_x = None
 activeTetro_y = None
 activeTetro_shape = None
@@ -105,16 +111,16 @@ def generateBlock():
     global activeTetro_x, activeTetro_y, activeTetro_shape, activeTetro_col, activeTetro_dir
     activeTetro_x = 1
     activeTetro_y = 5
-    activeTetro_shape = random.randint(0, 7)
-    activeTetro_col = random.randint(0, 7)
-    activeTetro_dir = random.randint(0, 3)
+    activeTetro_shape = np.random.randint(0, 7)
+    activeTetro_col = np.random.randint(1, 8)
+    activeTetro_dir = np.random.randint(0, 3)
 
 #テトリミノの描画
 def drawActiveTetro():
     k = 3
-    for i in range(activeBlock_y -1, activeBlock_y + 2):
+    for i in range(activeTetro_y -1, activeTetro_y + 2):
         m = 1
-        for j in range(activeBlock_x - 1, activeBlock_x + 2):
+        for j in range(activeTetro_x - 1, activeTetro_y + 2):
             if(tetroType[activeTetro_shape][activeTetro_dir] & 1 << ((k*3)-m)):
                 if(j-1 >= 0):
                     sense.set_pixel(i-1, j-1, tetroColor[activeTetro_col])
@@ -124,9 +130,9 @@ def drawActiveTetro():
 #テトリミノの衝突判定
 def checkMove(dx, dy):
     k = 3
-    for i in range(activeBlock_y - 1, activeBlock_y + 2):
+    for i in range(activeTetro_y - 1, activeTetro_y + 2):
         m = 1
-        for j in range(activeBlock_x - 1, activeBlock_x + 2):
+        for j in range(activeTetro_x - 1, activeTetro_y + 2):
             if(tetroType[activeTetro_shape][activeTetro_dir] & 1 << ((k*3)-m)):
                 if(playfield[i + dy][j + dx] != 0):
                     return True
@@ -137,9 +143,9 @@ def checkMove(dx, dy):
 #テトリミノの固定
 def fixTetro():
     k = 3
-    for i in range(activeBlock_y - 1, activeBlock_y + 2):
+    for i in range(activeTetro_y - 1, activeTetro_y + 2):
         m = 1
-        for j in range(activeBlock_x - 1, activeBlock_x + 2):
+        for j in range(activeTetro_x - 1, activeTetro_x + 2):
             if(tetroType[activeTetro_shape][activeTetro_dir] & 1 << ((k*3)-m)):
                 playfield[i][j] = activeTetro_shape + 1
             m += 1
@@ -149,11 +155,11 @@ def fixTetro():
 def drawPlayfield():
     for i in range(0, 8):
         for j in range(0,8):
-            sense.set_pixel(i, j, tetroColor[i+1][j+1])
+            sense.set_pixel(i, j, tetroColor[playfield[i+1][j+1]])
 
 #ラインの消去
 def checkLine():
-    linecount = 0
+    lineCount = 0
     i = 8
     while i > 0:
         brickCount = 0
@@ -201,11 +207,11 @@ while True:
             #左へ移動
             if e.direction == left_key and e.action == pressed:
                 if not checkMove(0, -1):
-                    activeBlock_y -= 1
+                    activeTetro_y -= 1
             #右へ移動
             if e.direction == right_key and e.action == pressed:
                 if not checkMove(0, 1):
-                    activeBlock_y += 1
+                    activeTetro_y += 1
             #テトリミノの回転
             if e.direction == up_key and e.action == pressed:
                 tmpDir = activeTetro_dir
@@ -232,30 +238,30 @@ while True:
         timeCounter = 0
         if not gameOver:
             if not checkMove(1, 0):
-                activeBlock_x += 1
+                activeTetro_x += 1
             else:
                 fixTetro()
                 linesDestroyed = checkLine()
                 if linesDestroyed == 1:
-                    score += 4
+                    score += 1
                 elif linesDestroyed == 2:
-                    score += 8
+                    score += 10
                 elif linesDestroyed == 3:
-                    score += 16
+                    score += 30
                 generateBlock()
                 if checkMove(0, 0):
                     for k in range(0, 2):
                         sense.clear(255, 0, 0)
                         time.sleep(0.2)
-                        snese.clear(255, 255, 255)
+                        sense.clear(255, 255, 255)
                         time.sleep(0.2)
-                    sense.show_message("GAME OVER",0.04)
-                    msg = str(score) + "points!"
+                    sense.show_message("GAME OVER!",0.04)
+                    msg = str(score) + "pts!"
                     sense.show_message(msg, 0.06)
                     clearPlayfield()
                     gameOver = True
             drawPlayfield()
             drawActiveTetro()
         else:
-            sense.set_pixels(arrow)
+            sense.set_pixels(re)
 
