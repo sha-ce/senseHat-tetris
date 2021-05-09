@@ -5,6 +5,8 @@ import numpy as np
 import sys
 
 sense = sense_hat.SenseHat()
+sense.set_imu_config(False, True, False)
+orientation = sense.get_orientation_degrees()
 sense.clear()
 
 #ジョイスティック設定
@@ -15,13 +17,6 @@ down_key   = sense_hat.DIRECTION_DOWN
 middle_key = sense_hat.DIRECTION_MIDDLE
 pressed    = sense_hat.ACTION_PRESSED
 released   = sense_hat.ACTION_RELEASED
-
-#画面の回転
-sense.set_rotation(90)
-left_key  = sense_hat.DIRECTION_UP
-right_key = sense_hat.DIRECTION_DOWN
-up_key    = sense_hat.DIRECTION_RIGHT
-down_key  = sense_hat.DIRECTION_LEFT
 
 #フィールドサイズ
 playfieldSize = 10
@@ -82,6 +77,13 @@ tetroType = np.array([
     [0x198, 0xB4, 0x198, 0xB4],   #6-Z
     [0xF0, 0x132, 0xF0, 0x132],   #7-S
 ])
+#例:I型
+#   0x38 = 000111000b   0x92 = 010010010b   0x38 = 000111000b   0x92 = 010010010b
+#
+#   0 0 0               0 1 0               0 0 0               0 1 0
+#   1 1 1               0 1 0               1 1 1               0 1 0
+#   0 0 0               0 1 0               0 0 0               0 1 0
+
 
 #リスタート時の矢印
 w = [150, 150, 150]
@@ -114,8 +116,8 @@ def generateBlock():
     activeTetro_x = 1
     activeTetro_y = 5
     activeTetro_shape = np.random.randint(0, 7)
-    activeTetro_col = np.random.randint(1, 8)
-    activeTetro_dir = np.random.randint(0, 3)
+    activeTetro_col   = np.random.randint(1, 8)
+    activeTetro_dir   = np.random.randint(0, 3)
 
 #テトリミノの描画
 def drawActiveTetro():
@@ -192,9 +194,36 @@ def restartGame():
     score = 0
     generateBlock()
 
-#最初のテトリミノの生成
-generateBlock()
+#ジャイロセンサによる盤面の回転
+def gyroRotate():
+    if pitch < 0:
+        sense.set_rotation(90)
+        left_key  = sense_hat.DIRECTION_UP
+        right_key = sense_hat.DIRECTION_DOWN
+        up_key    = sense_hat.DIRECTION_RIGHT
+        down_key  = sense_hat.DIRECTION_LEFT
+    elif pitch > 90:
+        sense.set_rotation(270)
+        left_key  = sense_hat.DIRECTION_DOWN
+        right_key = sense_hat.DIRECTION_UP
+        up_key    = sense_hat.DIRECTION_LEFT
+        down_key  = sense_hat.DIRECTION_RIGHT
+    elif roll > 90:
+        sense.set_rotation(180)
+        left_key  = sense_hat.DIRECTION_RIGHT
+        right_key = sense_hat.DIRECTION_LEFT
+        up_key    = sense_hat.DIRECTION_DOWN
+        down_key  = sense_hat.DIRECTION_UP
+    elif roll < 0:
+        sense.set_rotation(0)
+        left_key  = sense_hat.DIRECTION_LEFT
+        right_key = sense_hat.DIRECTION_RIGHT
+        up_key    = sense_hat.DIRECTION_UP
+        down_key  = sense_hat.DIRECTION_DOWN
 
+
+#最初のテトリミノを生成
+generateBlock()
 
 #main関数
 while True:
@@ -202,6 +231,13 @@ while True:
     dt = ct - lft
     lft = ct
     timeCounter += dt
+
+    #ジャイロによる操作
+    orientation = sense.get_orientation_degrees()
+    pitch = orientation["pitch"]
+    roll = orientation["roll"]
+    yaw = orientation["yaw"]
+    #gyroRotate()
 
     events = sense.stick.get_events()
     if events:
@@ -235,6 +271,7 @@ while True:
             if e.direction == down_key and e.action == pressed and gameOver:
                 sense.clear()
                 sys.exit()
+
 
     if(timeCounter > interval):
         timeCounter = 0
