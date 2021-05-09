@@ -192,7 +192,7 @@ def restartGame():
     score = 0
     generateBlock()
 
-#
+#最初のテトリミノの生成
 generateBlock()
 
 
